@@ -2,6 +2,8 @@ add_library(EffectsEngine STATIC
     Effects/Effect.h
     Effects/VolumeEffect.h
     Effects/VolumeEffect.cpp
+    Effects/EQEffect.h
+    Effects/EQEffect.cpp
     Effects/EffectChain.h
     Effects/EffectChain.cpp
 )

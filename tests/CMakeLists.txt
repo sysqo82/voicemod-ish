@@ -1,6 +1,7 @@
 add_executable(EffectsEngineTests
     EffectChainTests.cpp
     VolumeEffectTests.cpp
+    EQEffectTests.cpp
     TestRunner.cpp
 )
 
