@@ -1,6 +1,8 @@
 juce_add_gui_app(VoicemodIshApp
     PRODUCT_NAME "Voicemod-ish"
     VERSION 0.1.0
+    ICON_BIG "${CMAKE_CURRENT_SOURCE_DIR}/resources/icon.png"
+    ICON_SMALL "${CMAKE_CURRENT_SOURCE_DIR}/resources/icon.png"
 )
 
 target_sources(VoicemodIshApp PRIVATE
