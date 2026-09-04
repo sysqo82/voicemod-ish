@@ -26,6 +26,40 @@ void MainComponent::LevelMeter::paint(juce::Graphics& g)
     g.drawRect(getLocalBounds());
 }
 
+void MainComponent::VirtualMicOutput::pushBlock(const float* data, int numSamples)
+{
+    int start1, size1, start2, size2;
+    fifo.prepareToWrite(numSamples, start1, size1, start2, size2);
+    if (size1 > 0) ringBuffer.copyFrom(0, start1, data, size1);
+    if (size2 > 0) ringBuffer.copyFrom(0, start2, data + size1, size2);
+    fifo.finishedWrite(size1 + size2);
+}
+
+void MainComponent::VirtualMicOutput::audioDeviceIOCallbackWithContext(const float* const*, int,
+                                                                       float* const* outputChannelData,
+                                                                       int numOutputChannels, int numSamples,
+                                                                       const juce::AudioIODeviceCallbackContext&)
+{
+    const auto available = juce::jmin(numSamples, fifo.getNumReady());
+
+    int start1, size1, start2, size2;
+    fifo.prepareToRead(available, start1, size1, start2, size2);
+
+    for (int channel = 0; channel < numOutputChannels; ++channel)
+    {
+        if (outputChannelData[channel] == nullptr)
+            continue;
+
+        int written = 0;
+        if (size1 > 0) { juce::FloatVectorOperations::copy(outputChannelData[channel], ringBuffer.getReadPointer(0, start1), size1); written += size1; }
+        if (size2 > 0) { juce::FloatVectorOperations::copy(outputChannelData[channel] + written, ringBuffer.getReadPointer(0, start2), size2); written += size2; }
+        if (written < numSamples)
+            juce::FloatVectorOperations::clear(outputChannelData[channel] + written, numSamples - written);
+    }
+
+    fifo.finishedRead(size1 + size2);
+}
+
 MainComponent::MainComponent()
     : deviceSelector(deviceManager, 1, 1, 2, 2, false, false, true, false)
 {
@@ -47,6 +81,15 @@ MainComponent::MainComponent()
 
     addAndMakeVisible(inputLevelLabel);
     addAndMakeVisible(inputLevelMeter);
+
+    addAndMakeVisible(virtualMicOutputLabel);
+    addAndMakeVisible(virtualMicOutputBox);
+    virtualMicOutputBox.onChange = [this]
+    {
+        const auto id = virtualMicOutputBox.getSelectedId();
+        setVirtualMicOutputDevice(id <= 1 ? juce::String() : virtualMicOutputBox.getText());
+        saveSettings();
+    };
 
     addAndMakeVisible(volumeLabel);
     addAndMakeVisible(volumeEnabledButton);
@@ -298,6 +341,8 @@ MainComponent::MainComponent()
 MainComponent::~MainComponent()
 {
     deviceManager.removeAudioCallback(this);
+    if (virtualMicDevice != nullptr)
+        virtualMicDevice->stop();
     saveSettings();
 }
 
@@ -319,6 +364,11 @@ void MainComponent::resized()
     bypassButton.setBounds(topRow.removeFromLeft(100));
     inputLevelLabel.setBounds(topRow.removeFromLeft(80));
     inputLevelMeter.setBounds(topRow);
+    area.removeFromTop(10);
+
+    auto virtualMicRow = area.removeFromTop(24);
+    virtualMicOutputLabel.setBounds(virtualMicRow.removeFromLeft(120));
+    virtualMicOutputBox.setBounds(virtualMicRow.removeFromLeft(250));
     area.removeFromTop(10);
 
     struct Cell
@@ -382,6 +432,9 @@ void MainComponent::audioDeviceIOCallbackWithContext(const float* const* inputCh
     effectChain.processBlock(monoScratchBuffer);
 
     currentInputLevel.store(monoScratchBuffer.getMagnitude(0, numSamples));
+
+    if (virtualMicDevice != nullptr)
+        virtualMicCallback.pushBlock(mono, numSamples);
 
     for (int channel = 0; channel < numOutputChannels; ++channel)
         if (outputChannelData[channel] != nullptr)
@@ -464,6 +517,14 @@ void MainComponent::loadSettings()
         deviceManager.initialise(1, 2, savedDeviceState.get(), true);
     else
         deviceManager.initialise(1, 2, nullptr, true);
+
+    refreshVirtualMicOutputChoices();
+    const auto savedVirtualMicDevice = propertiesFile->getValue("virtualMicOutputDevice");
+    if (savedVirtualMicDevice.isNotEmpty())
+    {
+        virtualMicOutputBox.setText(savedVirtualMicDevice, juce::dontSendNotification);
+        setVirtualMicOutputDevice(savedVirtualMicDevice);
+    }
 }
 
 void MainComponent::saveSettings()
@@ -493,8 +554,67 @@ void MainComponent::saveSettings()
     propertiesFile->setValue("distortionEnabled", distortionEnabledButton.getToggleState());
     propertiesFile->setValue("reverbEnabled", reverbEnabledButton.getToggleState());
 
+    propertiesFile->setValue("virtualMicOutputDevice",
+                              virtualMicOutputBox.getSelectedId() <= 1 ? juce::String() : virtualMicOutputBox.getText());
+
     if (auto deviceState = std::unique_ptr<juce::XmlElement>(deviceManager.createStateXml()))
         propertiesFile->setValue("audioDeviceState", deviceState.get());
 
     propertiesFile->saveIfNeeded();
+}
+
+void MainComponent::refreshVirtualMicOutputChoices()
+{
+    virtualMicOutputBox.clear(juce::dontSendNotification);
+    virtualMicOutputBox.addItem("None", 1);
+
+    if (auto* type = deviceManager.getCurrentDeviceTypeObject())
+    {
+        type->scanForDevices();
+        int itemId = 2;
+        for (auto& name : type->getDeviceNames(false)) // false = output devices
+            virtualMicOutputBox.addItem(name, itemId++);
+    }
+
+    virtualMicOutputBox.setSelectedId(1, juce::dontSendNotification);
+}
+
+void MainComponent::setVirtualMicOutputDevice(const juce::String& deviceName)
+{
+    if (virtualMicDevice != nullptr)
+    {
+        virtualMicDevice->stop();
+        virtualMicDevice.reset();
+    }
+
+    if (deviceName.isEmpty())
+        return;
+
+    auto* type = deviceManager.getCurrentDeviceTypeObject();
+    if (type == nullptr)
+        return;
+
+    virtualMicDevice.reset(type->createDevice({}, deviceName));
+    if (virtualMicDevice == nullptr)
+        return;
+
+    // Match the primary device's sample rate where the virtual cable supports it, to avoid pitch drift.
+    auto sampleRate = deviceManager.getCurrentAudioDevice() != nullptr
+                           ? deviceManager.getCurrentAudioDevice()->getCurrentSampleRate()
+                           : 48000.0;
+    auto availableRates = virtualMicDevice->getAvailableSampleRates();
+    if (! availableRates.contains(sampleRate) && ! availableRates.isEmpty())
+        sampleRate = availableRates[0];
+
+    juce::BigInteger outputChannels;
+    outputChannels.setRange(0, 2, true);
+
+    const auto error = virtualMicDevice->open({}, outputChannels, sampleRate, virtualMicDevice->getDefaultBufferSize());
+    if (error.isNotEmpty())
+    {
+        virtualMicDevice.reset();
+        return;
+    }
+
+    virtualMicDevice->start(&virtualMicCallback);
 }

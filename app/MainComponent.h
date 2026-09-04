@@ -37,6 +37,31 @@ private:
     void saveSettings();
     static juce::PropertiesFile::Options makePropertiesOptions();
 
+    void refreshVirtualMicOutputChoices();
+    void setVirtualMicOutputDevice(const juce::String& deviceName); // empty = disabled ("None")
+
+    // Virtual Microphone output (v2, see ADR 0004): a second, independent, output-only AudioIODevice
+    // fed a copy of the processed mono buffer, so another app can use the paired virtual-cable
+    // recording endpoint as its microphone while the user still monitors on the real output device.
+    class VirtualMicOutput : public juce::AudioIODeviceCallback
+    {
+    public:
+        VirtualMicOutput() : ringBuffer(1, ringBufferSize) {}
+
+        void pushBlock(const float* data, int numSamples); // called from the primary audio thread
+
+        void audioDeviceIOCallbackWithContext(const float* const*, int, float* const* outputChannelData,
+                                              int numOutputChannels, int numSamples,
+                                              const juce::AudioIODeviceCallbackContext&) override;
+        void audioDeviceAboutToStart(juce::AudioIODevice*) override {}
+        void audioDeviceStopped() override {}
+
+    private:
+        static constexpr int ringBufferSize = 1 << 16;
+        juce::AbstractFifo fifo { ringBufferSize };
+        juce::AudioBuffer<float> ringBuffer;
+    };
+
     // A simple horizontal input level bar (see SPEC.md "input level meter").
     class LevelMeter : public juce::Component
     {
@@ -67,6 +92,11 @@ private:
     juce::ToggleButton bypassButton { "Bypass" };
     juce::Label inputLevelLabel { {}, "Input level" };
     LevelMeter inputLevelMeter;
+
+    juce::Label virtualMicOutputLabel { {}, "Virtual Mic Output" };
+    juce::ComboBox virtualMicOutputBox;
+    std::unique_ptr<juce::AudioIODevice> virtualMicDevice;
+    VirtualMicOutput virtualMicCallback;
 
     juce::Label volumeLabel { {}, "Volume" };
     juce::ToggleButton volumeEnabledButton { "On" };

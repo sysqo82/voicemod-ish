@@ -26,6 +26,8 @@ A JUCE-based (C++) Windows app that captures mic input via WASAPI, runs it throu
 14. As a user, I want the app to keep processing audio when I minimize the window, so that I can tuck it away while using it in a call/game.
 15. As a user, I want closing the app window to fully stop it, so that I have a simple, predictable way to turn it off.
 16. As a user, I want to run the app as a single portable .exe, so that I don't need to go through an installer to try it.
+17. As a user, I want to enable/disable each effect independently with its own on/off control (in addition to per-effect parameters), so that I can quickly A/B an effect without losing its settings.
+18. As a user, I want to select a virtual audio cable as a second "Virtual Mic Output", so that other apps (Discord, Zoom, games) can use my processed voice as their microphone, while I still hear myself on my real speakers/headphones.
 
 ## Implementation Decisions
 
@@ -41,12 +43,12 @@ A JUCE-based (C++) Windows app that captures mic input via WASAPI, runs it throu
   - Echo: single-tap delay line with delay-time, feedback, mix parameters.
   - Distortion: single soft-clip/overdrive waveshaper with one Drive parameter.
   - Reverb: `juce::dsp::Reverb` (algorithmic), exposing its standard room-size/damping/wet-dry parameters.
-- **Persistence**: `juce::PropertiesFile` stores the `Current Settings` (all effect params, enabled flags, selected input/output device names) and restores them on launch.
+- **Persistence**: `juce::PropertiesFile` stores the `Current Settings` (all effect params, enabled flags, selected input/output/virtual-mic device names) and restores them on launch.
 - **Device selection**: In-app dropdowns for input and output device, backed by `juce::AudioDeviceManager`'s device list.
-- **GUI**: Single window, all effect sections visible simultaneously (no tabs), plus device dropdowns, input level meter, global Bypass toggle, and a per-effect reset-to-default control.
+- **Virtual Microphone output (v2, see [ADR 0004](docs/adr/0004-virtual-microphone-output.md))**: a second "Virtual Mic Output" dropdown (default "None") lists output devices from the current device type; selecting one opens it as an independent, output-only `AudioIODevice` fed a copy of the processed mono buffer via a lock-free ring buffer, so the app monitors on the real device and feeds the virtual cable simultaneously. Requires the user to have a third-party virtual audio cable (e.g. VB-CABLE) already installed; not bundled.
+- **GUI**: Single window, all effect sections visible simultaneously (no tabs), plus device dropdowns (input/output/virtual mic output), input level meter, global Bypass toggle, and a per-effect enable toggle and reset-to-default control.
 - **Lifecycle**: Minimizing the window leaves audio processing running; closing the window terminates the app (no system tray/background mode).
 - **Packaging**: Build output is a portable `.exe`; no installer for v1.
-- **Out of scope for the architecture**: no virtual microphone driver (see [ADR 0001](docs/adr/0001-monitoring-only-scope.md)).
 
 ## Testing Decisions
 
@@ -57,7 +59,6 @@ A JUCE-based (C++) Windows app that captures mic input via WASAPI, runs it throu
 
 ## Out of Scope
 
-- Virtual microphone / injecting processed audio into other apps (Discord, games, Zoom).
 - Named/saveable presets (only a single persisted "current settings" state).
 - User-reorderable effect chain.
 - Formant-preserving pitch shifting.
