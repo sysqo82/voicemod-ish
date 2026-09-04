@@ -243,7 +243,9 @@ void MainComponent::resized()
 {
     auto area = getLocalBounds().reduced(10);
 
-    deviceSelector.setBounds(area.removeFromTop(150));
+    // AudioDeviceSelectorComponent renders channel checkboxes, sample rate, and buffer size below
+    // the device dropdowns, so it needs much more than a token allowance or it overlaps the rows below it.
+    deviceSelector.setBounds(area.removeFromTop(330));
     area.removeFromTop(10);
 
     auto topRow = area.removeFromTop(24);
