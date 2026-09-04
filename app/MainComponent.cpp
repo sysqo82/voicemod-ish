@@ -49,6 +49,14 @@ MainComponent::MainComponent()
     addAndMakeVisible(inputLevelMeter);
 
     addAndMakeVisible(volumeLabel);
+    addAndMakeVisible(volumeEnabledButton);
+    volumeEnabledButton.setToggleState(true, juce::dontSendNotification);
+    volumeEnabledButton.onClick = [this]
+    {
+        volumeEffect->enabled = volumeEnabledButton.getToggleState();
+        saveSettings();
+    };
+    addAndMakeVisible(volumeGainNameLabel);
     configureSlider(volumeGainSlider, -60.0, 12.0, 0.0, " dB");
     volumeGainSlider.onValueChange = [this]
     {
@@ -67,12 +75,24 @@ MainComponent::MainComponent()
     {
         volumeGainSlider.setValue(0.0, juce::dontSendNotification);
         volumeMuteButton.setToggleState(false, juce::dontSendNotification);
+        volumeEnabledButton.setToggleState(true, juce::dontSendNotification);
         volumeEffect->setGainDecibels(0.0f);
         volumeEffect->setMuted(false);
+        volumeEffect->enabled = true;
         saveSettings();
     };
 
     addAndMakeVisible(eqLabel);
+    addAndMakeVisible(eqEnabledButton);
+    eqEnabledButton.setToggleState(true, juce::dontSendNotification);
+    eqEnabledButton.onClick = [this]
+    {
+        eqEffect->enabled = eqEnabledButton.getToggleState();
+        saveSettings();
+    };
+    addAndMakeVisible(eqLowNameLabel);
+    addAndMakeVisible(eqMidNameLabel);
+    addAndMakeVisible(eqHighNameLabel);
     configureSlider(eqLowSlider, -12.0, 12.0, 0.0, " dB");
     configureSlider(eqMidSlider, -12.0, 12.0, 0.0, " dB");
     configureSlider(eqHighSlider, -12.0, 12.0, 0.0, " dB");
@@ -100,13 +120,23 @@ MainComponent::MainComponent()
         eqLowSlider.setValue(0.0, juce::dontSendNotification);
         eqMidSlider.setValue(0.0, juce::dontSendNotification);
         eqHighSlider.setValue(0.0, juce::dontSendNotification);
+        eqEnabledButton.setToggleState(true, juce::dontSendNotification);
         eqEffect->setLowShelfGainDecibels(0.0f);
         eqEffect->setMidPeakGainDecibels(0.0f);
         eqEffect->setHighShelfGainDecibels(0.0f);
+        eqEffect->enabled = true;
         saveSettings();
     };
 
     addAndMakeVisible(pitchLabel);
+    addAndMakeVisible(pitchEnabledButton);
+    pitchEnabledButton.setToggleState(true, juce::dontSendNotification);
+    pitchEnabledButton.onClick = [this]
+    {
+        pitchEffect->enabled = pitchEnabledButton.getToggleState();
+        saveSettings();
+    };
+    addAndMakeVisible(pitchNameLabel);
     configureSlider(pitchSlider, -12.0, 12.0, 0.0, " st");
     pitchSlider.onValueChange = [this]
     {
@@ -118,11 +148,23 @@ MainComponent::MainComponent()
     pitchResetButton.onClick = [this]
     {
         pitchSlider.setValue(0.0, juce::dontSendNotification);
+        pitchEnabledButton.setToggleState(true, juce::dontSendNotification);
         pitchEffect->setPitchSemitones(0.0f);
+        pitchEffect->enabled = true;
         saveSettings();
     };
 
     addAndMakeVisible(echoLabel);
+    addAndMakeVisible(echoEnabledButton);
+    echoEnabledButton.setToggleState(true, juce::dontSendNotification);
+    echoEnabledButton.onClick = [this]
+    {
+        echoEffect->enabled = echoEnabledButton.getToggleState();
+        saveSettings();
+    };
+    addAndMakeVisible(echoDelayNameLabel);
+    addAndMakeVisible(echoFeedbackNameLabel);
+    addAndMakeVisible(echoMixNameLabel);
     configureSlider(echoDelaySlider, 0.01, 1.0, 0.3, " s");
     configureSlider(echoFeedbackSlider, 0.0, 0.95, 0.3, "");
     configureSlider(echoMixSlider, 0.0, 1.0, 0.3, "");
@@ -150,13 +192,23 @@ MainComponent::MainComponent()
         echoDelaySlider.setValue(0.3, juce::dontSendNotification);
         echoFeedbackSlider.setValue(0.3, juce::dontSendNotification);
         echoMixSlider.setValue(0.3, juce::dontSendNotification);
+        echoEnabledButton.setToggleState(true, juce::dontSendNotification);
         echoEffect->setDelayTimeSeconds(0.3f);
         echoEffect->setFeedback(0.3f);
         echoEffect->setMix(0.3f);
+        echoEffect->enabled = true;
         saveSettings();
     };
 
     addAndMakeVisible(distortionLabel);
+    addAndMakeVisible(distortionEnabledButton);
+    distortionEnabledButton.setToggleState(true, juce::dontSendNotification);
+    distortionEnabledButton.onClick = [this]
+    {
+        distortionEffect->enabled = distortionEnabledButton.getToggleState();
+        saveSettings();
+    };
+    addAndMakeVisible(distortionDriveNameLabel);
     configureSlider(distortionDriveSlider, 0.0, 1.0, 0.0, "");
     distortionDriveSlider.onValueChange = [this]
     {
@@ -168,11 +220,23 @@ MainComponent::MainComponent()
     distortionResetButton.onClick = [this]
     {
         distortionDriveSlider.setValue(0.0, juce::dontSendNotification);
+        distortionEnabledButton.setToggleState(true, juce::dontSendNotification);
         distortionEffect->setDrive(0.0f);
+        distortionEffect->enabled = true;
         saveSettings();
     };
 
     addAndMakeVisible(reverbLabel);
+    addAndMakeVisible(reverbEnabledButton);
+    reverbEnabledButton.setToggleState(true, juce::dontSendNotification);
+    reverbEnabledButton.onClick = [this]
+    {
+        reverbEffect->enabled = reverbEnabledButton.getToggleState();
+        saveSettings();
+    };
+    addAndMakeVisible(reverbRoomNameLabel);
+    addAndMakeVisible(reverbDampingNameLabel);
+    addAndMakeVisible(reverbMixNameLabel);
     configureSlider(reverbRoomSlider, 0.0, 1.0, 0.5, "");
     configureSlider(reverbDampingSlider, 0.0, 1.0, 0.5, "");
     configureSlider(reverbMixSlider, 0.0, 1.0, 0.0, "");
@@ -200,11 +264,14 @@ MainComponent::MainComponent()
         reverbRoomSlider.setValue(0.5, juce::dontSendNotification);
         reverbDampingSlider.setValue(0.5, juce::dontSendNotification);
         reverbMixSlider.setValue(0.0, juce::dontSendNotification);
+        reverbEnabledButton.setToggleState(true, juce::dontSendNotification);
         reverbEffect->setRoomSize(0.5f);
         reverbEffect->setDamping(0.5f);
         reverbEffect->setWetDryMix(0.0f);
+        reverbEffect->enabled = true;
         saveSettings();
     };
+
 
     // Apply the slider defaults set above to the effects, then let loadSettings() override with any saved state.
     volumeEffect->setGainDecibels((float) volumeGainSlider.getValue());
@@ -224,7 +291,7 @@ MainComponent::MainComponent()
     loadSettings();
     deviceManager.addAudioCallback(this);
 
-    setSize(700, 760);
+    setSize(820, 800);
     startTimerHz(20);
 }
 
@@ -254,21 +321,41 @@ void MainComponent::resized()
     inputLevelMeter.setBounds(topRow);
     area.removeFromTop(10);
 
-    auto layoutRow = [&area](std::initializer_list<juce::Component*> components)
+    struct Cell
     {
-        auto row = area.removeFromTop(28);
-        const auto widthEach = row.getWidth() / (int) components.size();
-        for (auto* component : components)
-            component->setBounds(row.removeFromLeft(widthEach).reduced(2));
+        juce::Component* nameLabel; // nullptr for cells that don't need one (section label, toggles, reset)
+        juce::Component* control;
+    };
+
+    auto layoutRow = [&area](std::initializer_list<Cell> cells)
+    {
+        auto row = area.removeFromTop(30);
+        const auto widthEach = row.getWidth() / (int) cells.size();
+        for (auto& cell : cells)
+        {
+            auto cellArea = row.removeFromLeft(widthEach).reduced(2);
+            if (cell.nameLabel != nullptr)
+                cell.nameLabel->setBounds(cellArea.removeFromLeft(44));
+            cell.control->setBounds(cellArea);
+        }
         area.removeFromTop(6);
     };
 
-    layoutRow({ &volumeLabel, &volumeGainSlider, &volumeMuteButton, &volumeResetButton });
-    layoutRow({ &eqLabel, &eqLowSlider, &eqMidSlider, &eqHighSlider, &eqResetButton });
-    layoutRow({ &pitchLabel, &pitchSlider, &pitchResetButton });
-    layoutRow({ &echoLabel, &echoDelaySlider, &echoFeedbackSlider, &echoMixSlider, &echoResetButton });
-    layoutRow({ &distortionLabel, &distortionDriveSlider, &distortionResetButton });
-    layoutRow({ &reverbLabel, &reverbRoomSlider, &reverbDampingSlider, &reverbMixSlider, &reverbResetButton });
+    layoutRow({ { nullptr, &volumeLabel }, { nullptr, &volumeEnabledButton },
+                { &volumeGainNameLabel, &volumeGainSlider }, { nullptr, &volumeMuteButton }, { nullptr, &volumeResetButton } });
+    layoutRow({ { nullptr, &eqLabel }, { nullptr, &eqEnabledButton },
+                { &eqLowNameLabel, &eqLowSlider }, { &eqMidNameLabel, &eqMidSlider }, { &eqHighNameLabel, &eqHighSlider },
+                { nullptr, &eqResetButton } });
+    layoutRow({ { nullptr, &pitchLabel }, { nullptr, &pitchEnabledButton },
+                { &pitchNameLabel, &pitchSlider }, { nullptr, &pitchResetButton } });
+    layoutRow({ { nullptr, &echoLabel }, { nullptr, &echoEnabledButton },
+                { &echoDelayNameLabel, &echoDelaySlider }, { &echoFeedbackNameLabel, &echoFeedbackSlider },
+                { &echoMixNameLabel, &echoMixSlider }, { nullptr, &echoResetButton } });
+    layoutRow({ { nullptr, &distortionLabel }, { nullptr, &distortionEnabledButton },
+                { &distortionDriveNameLabel, &distortionDriveSlider }, { nullptr, &distortionResetButton } });
+    layoutRow({ { nullptr, &reverbLabel }, { nullptr, &reverbEnabledButton },
+                { &reverbRoomNameLabel, &reverbRoomSlider }, { &reverbDampingNameLabel, &reverbDampingSlider },
+                { &reverbMixNameLabel, &reverbMixSlider }, { nullptr, &reverbResetButton } });
 }
 
 void MainComponent::audioDeviceIOCallbackWithContext(const float* const* inputChannelData, int numInputChannels,
@@ -344,6 +431,13 @@ void MainComponent::loadSettings()
     reverbMixSlider.setValue(propertiesFile->getDoubleValue("reverbMix", 0.0), juce::dontSendNotification);
     bypassButton.setToggleState(propertiesFile->getBoolValue("bypass", false), juce::dontSendNotification);
 
+    volumeEnabledButton.setToggleState(propertiesFile->getBoolValue("volumeEnabled", true), juce::dontSendNotification);
+    eqEnabledButton.setToggleState(propertiesFile->getBoolValue("eqEnabled", true), juce::dontSendNotification);
+    pitchEnabledButton.setToggleState(propertiesFile->getBoolValue("pitchEnabled", true), juce::dontSendNotification);
+    echoEnabledButton.setToggleState(propertiesFile->getBoolValue("echoEnabled", true), juce::dontSendNotification);
+    distortionEnabledButton.setToggleState(propertiesFile->getBoolValue("distortionEnabled", true), juce::dontSendNotification);
+    reverbEnabledButton.setToggleState(propertiesFile->getBoolValue("reverbEnabled", true), juce::dontSendNotification);
+
     volumeEffect->setGainDecibels((float) volumeGainSlider.getValue());
     volumeEffect->setMuted(volumeMuteButton.getToggleState());
     eqEffect->setLowShelfGainDecibels((float) eqLowSlider.getValue());
@@ -358,6 +452,13 @@ void MainComponent::loadSettings()
     reverbEffect->setDamping((float) reverbDampingSlider.getValue());
     reverbEffect->setWetDryMix((float) reverbMixSlider.getValue());
     effectChain.bypassed = bypassButton.getToggleState();
+
+    volumeEffect->enabled = volumeEnabledButton.getToggleState();
+    eqEffect->enabled = eqEnabledButton.getToggleState();
+    pitchEffect->enabled = pitchEnabledButton.getToggleState();
+    echoEffect->enabled = echoEnabledButton.getToggleState();
+    distortionEffect->enabled = distortionEnabledButton.getToggleState();
+    reverbEffect->enabled = reverbEnabledButton.getToggleState();
 
     if (auto savedDeviceState = std::unique_ptr<juce::XmlElement>(propertiesFile->getXmlValue("audioDeviceState")))
         deviceManager.initialise(1, 2, savedDeviceState.get(), true);
@@ -384,6 +485,13 @@ void MainComponent::saveSettings()
     propertiesFile->setValue("reverbDamping", reverbDampingSlider.getValue());
     propertiesFile->setValue("reverbMix", reverbMixSlider.getValue());
     propertiesFile->setValue("bypass", bypassButton.getToggleState());
+
+    propertiesFile->setValue("volumeEnabled", volumeEnabledButton.getToggleState());
+    propertiesFile->setValue("eqEnabled", eqEnabledButton.getToggleState());
+    propertiesFile->setValue("pitchEnabled", pitchEnabledButton.getToggleState());
+    propertiesFile->setValue("echoEnabled", echoEnabledButton.getToggleState());
+    propertiesFile->setValue("distortionEnabled", distortionEnabledButton.getToggleState());
+    propertiesFile->setValue("reverbEnabled", reverbEnabledButton.getToggleState());
 
     if (auto deviceState = std::unique_ptr<juce::XmlElement>(deviceManager.createStateXml()))
         propertiesFile->setValue("audioDeviceState", deviceState.get());

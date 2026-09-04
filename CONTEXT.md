@@ -1,6 +1,6 @@
 # Voicemod-ish
 
-A Windows desktop app that applies real-time voice effects to a microphone signal for monitoring (headphones/speakers), not for injecting into other apps.
+A Windows desktop app that applies real-time voice effects to a microphone signal, both for monitoring (headphones/speakers) and as a Virtual Microphone other apps can select as their input.
 
 ## Language
 
@@ -19,3 +19,7 @@ _Avoid_: Preset, profile
 **Bypass**:
 A single global toggle that routes mic input straight to output, skipping the entire Effect Chain, for A/B comparison. Distinct from disabling Effects individually.
 _Avoid_: Mute, disable all
+
+**Virtual Microphone**:
+A third-party virtual audio cable's playback endpoint, selected as an output device, so the processed signal becomes selectable as a microphone in other apps (Discord, Zoom, games). See [ADR 0004](docs/adr/0004-virtual-microphone-output.md).
+_Avoid_: Virtual audio device, loopback device
