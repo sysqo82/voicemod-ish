@@ -6,6 +6,8 @@ add_library(EffectsEngine STATIC
     Effects/EQEffect.cpp
     Effects/PitchEffect.h
     Effects/PitchEffect.cpp
+    Effects/EchoEffect.h
+    Effects/EchoEffect.cpp
     Effects/EffectChain.h
     Effects/EffectChain.cpp
 )

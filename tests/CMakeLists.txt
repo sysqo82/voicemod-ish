@@ -3,6 +3,7 @@ add_executable(EffectsEngineTests
     VolumeEffectTests.cpp
     EQEffectTests.cpp
     PitchEffectTests.cpp
+    EchoEffectTests.cpp
     TestRunner.cpp
 )
 
