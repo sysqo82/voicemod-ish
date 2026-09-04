@@ -412,7 +412,7 @@ int MainComponent::layoutEffectBox(juce::GroupComponent& box, juce::ToggleButton
     box.setBounds(boxArea);
 
     // On/Reset sit in the box's title bar, to the right of the title text.
-    auto headerRow = boxArea.removeFromTop(titleBarHeight).reduced(sidePadding, 4);
+    auto headerRow = boxArea.removeFromTop(titleBarHeight).withTrimmedTop(8).reduced(sidePadding, 2);
     resetButton.setBounds(headerRow.removeFromRight(70));
     headerRow.removeFromRight(8);
     enabledButton.setBounds(headerRow.removeFromRight(60));
