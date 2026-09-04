@@ -91,29 +91,32 @@ MainComponent::MainComponent()
         saveSettings();
     };
 
-    addAndMakeVisible(volumeLabel);
-    addAndMakeVisible(volumeEnabledButton);
+    addAndMakeVisible(effectsViewport);
+    effectsViewport.setViewedComponent(&effectsViewportContent, false);
+
+    effectsViewportContent.addAndMakeVisible(volumeBox);
+    effectsViewportContent.addAndMakeVisible(volumeEnabledButton);
     volumeEnabledButton.setToggleState(true, juce::dontSendNotification);
     volumeEnabledButton.onClick = [this]
     {
         volumeEffect->enabled = volumeEnabledButton.getToggleState();
         saveSettings();
     };
-    addAndMakeVisible(volumeGainNameLabel);
+    effectsViewportContent.addAndMakeVisible(volumeGainNameLabel);
     configureSlider(volumeGainSlider, -60.0, 12.0, 0.0, " dB");
     volumeGainSlider.onValueChange = [this]
     {
         volumeEffect->setGainDecibels((float) volumeGainSlider.getValue());
         saveSettings();
     };
-    addAndMakeVisible(volumeGainSlider);
-    addAndMakeVisible(volumeMuteButton);
+    effectsViewportContent.addAndMakeVisible(volumeGainSlider);
+    effectsViewportContent.addAndMakeVisible(volumeMuteButton);
     volumeMuteButton.onClick = [this]
     {
         volumeEffect->setMuted(volumeMuteButton.getToggleState());
         saveSettings();
     };
-    addAndMakeVisible(volumeResetButton);
+    effectsViewportContent.addAndMakeVisible(volumeResetButton);
     volumeResetButton.onClick = [this]
     {
         volumeGainSlider.setValue(0.0, juce::dontSendNotification);
@@ -125,17 +128,17 @@ MainComponent::MainComponent()
         saveSettings();
     };
 
-    addAndMakeVisible(eqLabel);
-    addAndMakeVisible(eqEnabledButton);
+    effectsViewportContent.addAndMakeVisible(eqBox);
+    effectsViewportContent.addAndMakeVisible(eqEnabledButton);
     eqEnabledButton.setToggleState(true, juce::dontSendNotification);
     eqEnabledButton.onClick = [this]
     {
         eqEffect->enabled = eqEnabledButton.getToggleState();
         saveSettings();
     };
-    addAndMakeVisible(eqLowNameLabel);
-    addAndMakeVisible(eqMidNameLabel);
-    addAndMakeVisible(eqHighNameLabel);
+    effectsViewportContent.addAndMakeVisible(eqLowNameLabel);
+    effectsViewportContent.addAndMakeVisible(eqMidNameLabel);
+    effectsViewportContent.addAndMakeVisible(eqHighNameLabel);
     configureSlider(eqLowSlider, -12.0, 12.0, 0.0, " dB");
     configureSlider(eqMidSlider, -12.0, 12.0, 0.0, " dB");
     configureSlider(eqHighSlider, -12.0, 12.0, 0.0, " dB");
@@ -154,10 +157,10 @@ MainComponent::MainComponent()
         eqEffect->setHighShelfGainDecibels((float) eqHighSlider.getValue());
         saveSettings();
     };
-    addAndMakeVisible(eqLowSlider);
-    addAndMakeVisible(eqMidSlider);
-    addAndMakeVisible(eqHighSlider);
-    addAndMakeVisible(eqResetButton);
+    effectsViewportContent.addAndMakeVisible(eqLowSlider);
+    effectsViewportContent.addAndMakeVisible(eqMidSlider);
+    effectsViewportContent.addAndMakeVisible(eqHighSlider);
+    effectsViewportContent.addAndMakeVisible(eqResetButton);
     eqResetButton.onClick = [this]
     {
         eqLowSlider.setValue(0.0, juce::dontSendNotification);
@@ -171,23 +174,23 @@ MainComponent::MainComponent()
         saveSettings();
     };
 
-    addAndMakeVisible(pitchLabel);
-    addAndMakeVisible(pitchEnabledButton);
+    effectsViewportContent.addAndMakeVisible(pitchBox);
+    effectsViewportContent.addAndMakeVisible(pitchEnabledButton);
     pitchEnabledButton.setToggleState(true, juce::dontSendNotification);
     pitchEnabledButton.onClick = [this]
     {
         pitchEffect->enabled = pitchEnabledButton.getToggleState();
         saveSettings();
     };
-    addAndMakeVisible(pitchNameLabel);
+    effectsViewportContent.addAndMakeVisible(pitchNameLabel);
     configureSlider(pitchSlider, -12.0, 12.0, 0.0, " st");
     pitchSlider.onValueChange = [this]
     {
         pitchEffect->setPitchSemitones((float) pitchSlider.getValue());
         saveSettings();
     };
-    addAndMakeVisible(pitchSlider);
-    addAndMakeVisible(pitchResetButton);
+    effectsViewportContent.addAndMakeVisible(pitchSlider);
+    effectsViewportContent.addAndMakeVisible(pitchResetButton);
     pitchResetButton.onClick = [this]
     {
         pitchSlider.setValue(0.0, juce::dontSendNotification);
@@ -197,17 +200,17 @@ MainComponent::MainComponent()
         saveSettings();
     };
 
-    addAndMakeVisible(echoLabel);
-    addAndMakeVisible(echoEnabledButton);
+    effectsViewportContent.addAndMakeVisible(echoBox);
+    effectsViewportContent.addAndMakeVisible(echoEnabledButton);
     echoEnabledButton.setToggleState(true, juce::dontSendNotification);
     echoEnabledButton.onClick = [this]
     {
         echoEffect->enabled = echoEnabledButton.getToggleState();
         saveSettings();
     };
-    addAndMakeVisible(echoDelayNameLabel);
-    addAndMakeVisible(echoFeedbackNameLabel);
-    addAndMakeVisible(echoMixNameLabel);
+    effectsViewportContent.addAndMakeVisible(echoDelayNameLabel);
+    effectsViewportContent.addAndMakeVisible(echoFeedbackNameLabel);
+    effectsViewportContent.addAndMakeVisible(echoMixNameLabel);
     configureSlider(echoDelaySlider, 0.01, 1.0, 0.3, " s");
     configureSlider(echoFeedbackSlider, 0.0, 0.95, 0.3, "");
     configureSlider(echoMixSlider, 0.0, 1.0, 0.3, "");
@@ -226,10 +229,10 @@ MainComponent::MainComponent()
         echoEffect->setMix((float) echoMixSlider.getValue());
         saveSettings();
     };
-    addAndMakeVisible(echoDelaySlider);
-    addAndMakeVisible(echoFeedbackSlider);
-    addAndMakeVisible(echoMixSlider);
-    addAndMakeVisible(echoResetButton);
+    effectsViewportContent.addAndMakeVisible(echoDelaySlider);
+    effectsViewportContent.addAndMakeVisible(echoFeedbackSlider);
+    effectsViewportContent.addAndMakeVisible(echoMixSlider);
+    effectsViewportContent.addAndMakeVisible(echoResetButton);
     echoResetButton.onClick = [this]
     {
         echoDelaySlider.setValue(0.3, juce::dontSendNotification);
@@ -243,23 +246,23 @@ MainComponent::MainComponent()
         saveSettings();
     };
 
-    addAndMakeVisible(distortionLabel);
-    addAndMakeVisible(distortionEnabledButton);
+    effectsViewportContent.addAndMakeVisible(distortionBox);
+    effectsViewportContent.addAndMakeVisible(distortionEnabledButton);
     distortionEnabledButton.setToggleState(true, juce::dontSendNotification);
     distortionEnabledButton.onClick = [this]
     {
         distortionEffect->enabled = distortionEnabledButton.getToggleState();
         saveSettings();
     };
-    addAndMakeVisible(distortionDriveNameLabel);
+    effectsViewportContent.addAndMakeVisible(distortionDriveNameLabel);
     configureSlider(distortionDriveSlider, 0.0, 1.0, 0.0, "");
     distortionDriveSlider.onValueChange = [this]
     {
         distortionEffect->setDrive((float) distortionDriveSlider.getValue());
         saveSettings();
     };
-    addAndMakeVisible(distortionDriveSlider);
-    addAndMakeVisible(distortionResetButton);
+    effectsViewportContent.addAndMakeVisible(distortionDriveSlider);
+    effectsViewportContent.addAndMakeVisible(distortionResetButton);
     distortionResetButton.onClick = [this]
     {
         distortionDriveSlider.setValue(0.0, juce::dontSendNotification);
@@ -269,17 +272,17 @@ MainComponent::MainComponent()
         saveSettings();
     };
 
-    addAndMakeVisible(reverbLabel);
-    addAndMakeVisible(reverbEnabledButton);
+    effectsViewportContent.addAndMakeVisible(reverbBox);
+    effectsViewportContent.addAndMakeVisible(reverbEnabledButton);
     reverbEnabledButton.setToggleState(true, juce::dontSendNotification);
     reverbEnabledButton.onClick = [this]
     {
         reverbEffect->enabled = reverbEnabledButton.getToggleState();
         saveSettings();
     };
-    addAndMakeVisible(reverbRoomNameLabel);
-    addAndMakeVisible(reverbDampingNameLabel);
-    addAndMakeVisible(reverbMixNameLabel);
+    effectsViewportContent.addAndMakeVisible(reverbRoomNameLabel);
+    effectsViewportContent.addAndMakeVisible(reverbDampingNameLabel);
+    effectsViewportContent.addAndMakeVisible(reverbMixNameLabel);
     configureSlider(reverbRoomSlider, 0.0, 1.0, 0.5, "");
     configureSlider(reverbDampingSlider, 0.0, 1.0, 0.5, "");
     configureSlider(reverbMixSlider, 0.0, 1.0, 0.0, "");
@@ -298,10 +301,10 @@ MainComponent::MainComponent()
         reverbEffect->setWetDryMix((float) reverbMixSlider.getValue());
         saveSettings();
     };
-    addAndMakeVisible(reverbRoomSlider);
-    addAndMakeVisible(reverbDampingSlider);
-    addAndMakeVisible(reverbMixSlider);
-    addAndMakeVisible(reverbResetButton);
+    effectsViewportContent.addAndMakeVisible(reverbRoomSlider);
+    effectsViewportContent.addAndMakeVisible(reverbDampingSlider);
+    effectsViewportContent.addAndMakeVisible(reverbMixSlider);
+    effectsViewportContent.addAndMakeVisible(reverbResetButton);
     reverbResetButton.onClick = [this]
     {
         reverbRoomSlider.setValue(0.5, juce::dontSendNotification);
@@ -371,41 +374,62 @@ void MainComponent::resized()
     virtualMicOutputBox.setBounds(virtualMicRow.removeFromLeft(250));
     area.removeFromTop(10);
 
-    struct Cell
-    {
-        juce::Component* nameLabel; // nullptr for cells that don't need one (section label, toggles, reset)
-        juce::Component* control;
-    };
+    effectsViewport.setBounds(area);
 
-    auto layoutRow = [&area](std::initializer_list<Cell> cells)
-    {
-        auto row = area.removeFromTop(30);
-        const auto widthEach = row.getWidth() / (int) cells.size();
-        for (auto& cell : cells)
-        {
-            auto cellArea = row.removeFromLeft(widthEach).reduced(2);
-            if (cell.nameLabel != nullptr)
-                cell.nameLabel->setBounds(cellArea.removeFromLeft(44));
-            cell.control->setBounds(cellArea);
-        }
-        area.removeFromTop(6);
-    };
+    const auto contentWidth = area.getWidth() - effectsViewport.getScrollBarThickness();
+    int y = 8;
+    y = layoutEffectBox(volumeBox, volumeEnabledButton, volumeResetButton, contentWidth, y,
+                         { { &volumeGainNameLabel, &volumeGainSlider, &volumeMuteButton } });
+    y = layoutEffectBox(eqBox, eqEnabledButton, eqResetButton, contentWidth, y,
+                         { { &eqLowNameLabel, &eqLowSlider }, { &eqMidNameLabel, &eqMidSlider }, { &eqHighNameLabel, &eqHighSlider } });
+    y = layoutEffectBox(pitchBox, pitchEnabledButton, pitchResetButton, contentWidth, y,
+                         { { &pitchNameLabel, &pitchSlider } });
+    y = layoutEffectBox(echoBox, echoEnabledButton, echoResetButton, contentWidth, y,
+                         { { &echoDelayNameLabel, &echoDelaySlider }, { &echoFeedbackNameLabel, &echoFeedbackSlider },
+                           { &echoMixNameLabel, &echoMixSlider } });
+    y = layoutEffectBox(distortionBox, distortionEnabledButton, distortionResetButton, contentWidth, y,
+                         { { &distortionDriveNameLabel, &distortionDriveSlider } });
+    y = layoutEffectBox(reverbBox, reverbEnabledButton, reverbResetButton, contentWidth, y,
+                         { { &reverbRoomNameLabel, &reverbRoomSlider }, { &reverbDampingNameLabel, &reverbDampingSlider },
+                           { &reverbMixNameLabel, &reverbMixSlider } });
 
-    layoutRow({ { nullptr, &volumeLabel }, { nullptr, &volumeEnabledButton },
-                { &volumeGainNameLabel, &volumeGainSlider }, { nullptr, &volumeMuteButton }, { nullptr, &volumeResetButton } });
-    layoutRow({ { nullptr, &eqLabel }, { nullptr, &eqEnabledButton },
-                { &eqLowNameLabel, &eqLowSlider }, { &eqMidNameLabel, &eqMidSlider }, { &eqHighNameLabel, &eqHighSlider },
-                { nullptr, &eqResetButton } });
-    layoutRow({ { nullptr, &pitchLabel }, { nullptr, &pitchEnabledButton },
-                { &pitchNameLabel, &pitchSlider }, { nullptr, &pitchResetButton } });
-    layoutRow({ { nullptr, &echoLabel }, { nullptr, &echoEnabledButton },
-                { &echoDelayNameLabel, &echoDelaySlider }, { &echoFeedbackNameLabel, &echoFeedbackSlider },
-                { &echoMixNameLabel, &echoMixSlider }, { nullptr, &echoResetButton } });
-    layoutRow({ { nullptr, &distortionLabel }, { nullptr, &distortionEnabledButton },
-                { &distortionDriveNameLabel, &distortionDriveSlider }, { nullptr, &distortionResetButton } });
-    layoutRow({ { nullptr, &reverbLabel }, { nullptr, &reverbEnabledButton },
-                { &reverbRoomNameLabel, &reverbRoomSlider }, { &reverbDampingNameLabel, &reverbDampingSlider },
-                { &reverbMixNameLabel, &reverbMixSlider }, { nullptr, &reverbResetButton } });
+    effectsViewportContent.setSize(contentWidth, y);
+}
+
+int MainComponent::layoutEffectBox(juce::GroupComponent& box, juce::ToggleButton& enabledButton,
+                                    juce::TextButton& resetButton, int contentWidth, int contentY,
+                                    std::initializer_list<ParamRow> rows)
+{
+    constexpr int titleBarHeight = 28;
+    constexpr int rowHeight = 32;
+    constexpr int bottomPadding = 12;
+    constexpr int sidePadding = 12;
+    constexpr int nameLabelWidth = 80;
+    constexpr int extraControlWidth = 70; // e.g. Volume's Mute toggle
+
+    const auto height = titleBarHeight + (int) rows.size() * rowHeight + bottomPadding;
+    juce::Rectangle<int> boxArea(0, contentY, contentWidth, height);
+    box.setBounds(boxArea);
+
+    // On/Reset sit in the box's title bar, to the right of the title text.
+    auto headerRow = boxArea.removeFromTop(titleBarHeight).reduced(sidePadding, 4);
+    resetButton.setBounds(headerRow.removeFromRight(70));
+    headerRow.removeFromRight(8);
+    enabledButton.setBounds(headerRow.removeFromRight(60));
+
+    auto inner = boxArea.reduced(sidePadding, 0);
+    inner.removeFromBottom(bottomPadding);
+    for (auto& row : rows)
+    {
+        auto r = inner.removeFromTop(rowHeight).reduced(0, 3);
+        row.nameLabel->setBounds(r.removeFromLeft(nameLabelWidth));
+        if (row.extra != nullptr)
+            row.extra->setBounds(r.removeFromRight(extraControlWidth));
+        r.removeFromLeft(8);
+        row.slider->setBounds(r);
+    }
+
+    return contentY + height + 10; // gap before the next box
 }
 
 void MainComponent::audioDeviceIOCallbackWithContext(const float* const* inputChannelData, int numInputChannels,

@@ -98,43 +98,51 @@ private:
     std::unique_ptr<juce::AudioIODevice> virtualMicDevice;
     VirtualMicOutput virtualMicCallback;
 
-    juce::Label volumeLabel { {}, "Volume" };
+    juce::Viewport effectsViewport;
+    juce::Component effectsViewportContent;
+
+    juce::GroupComponent volumeBox { {}, "Volume" };
     juce::ToggleButton volumeEnabledButton { "On" };
     juce::Label volumeGainNameLabel { {}, "Gain" };
     juce::Slider volumeGainSlider;
     juce::ToggleButton volumeMuteButton { "Mute" };
     juce::TextButton volumeResetButton { "Reset" };
 
-    juce::Label eqLabel { {}, "EQ" };
+    juce::GroupComponent eqBox { {}, "EQ" };
     juce::ToggleButton eqEnabledButton { "On" };
     juce::Label eqLowNameLabel { {}, "Low" }, eqMidNameLabel { {}, "Mid" }, eqHighNameLabel { {}, "High" };
     juce::Slider eqLowSlider, eqMidSlider, eqHighSlider;
     juce::TextButton eqResetButton { "Reset" };
 
-    juce::Label pitchLabel { {}, "Pitch" };
+    juce::GroupComponent pitchBox { {}, "Pitch" };
     juce::ToggleButton pitchEnabledButton { "On" };
     juce::Label pitchNameLabel { {}, "Semitones" };
     juce::Slider pitchSlider;
     juce::TextButton pitchResetButton { "Reset" };
 
-    juce::Label echoLabel { {}, "Echo" };
+    juce::GroupComponent echoBox { {}, "Echo" };
     juce::ToggleButton echoEnabledButton { "On" };
     juce::Label echoDelayNameLabel { {}, "Delay" }, echoFeedbackNameLabel { {}, "Feedback" }, echoMixNameLabel { {}, "Mix" };
     juce::Slider echoDelaySlider, echoFeedbackSlider, echoMixSlider;
     juce::TextButton echoResetButton { "Reset" };
 
-    juce::Label distortionLabel { {}, "Distortion" };
+    juce::GroupComponent distortionBox { {}, "Distortion" };
     juce::ToggleButton distortionEnabledButton { "On" };
     juce::Label distortionDriveNameLabel { {}, "Drive" };
     juce::Slider distortionDriveSlider;
     juce::TextButton distortionResetButton { "Reset" };
 
-    juce::Label reverbLabel { {}, "Reverb" };
+    juce::GroupComponent reverbBox { {}, "Reverb" };
     juce::ToggleButton reverbEnabledButton { "On" };
     juce::Label reverbRoomNameLabel { {}, "Room" }, reverbDampingNameLabel { {}, "Damping" }, reverbMixNameLabel { {}, "Mix" };
     juce::Slider reverbRoomSlider, reverbDampingSlider, reverbMixSlider;
     juce::TextButton reverbResetButton { "Reset" };
 
+    // Lays out one boxed effect section (title bar with On/Reset, one full-width row per parameter)
+    // inside effectsViewportContent, starting at contentY, and returns the Y position below it.
+    struct ParamRow { juce::Component* nameLabel; juce::Component* slider; juce::Component* extra = nullptr; };
+    int layoutEffectBox(juce::GroupComponent& box, juce::ToggleButton& enabledButton, juce::TextButton& resetButton,
+                         int contentWidth, int contentY, std::initializer_list<ParamRow> rows);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MainComponent)
 };
