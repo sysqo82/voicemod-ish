@@ -8,6 +8,8 @@ add_library(EffectsEngine STATIC
     Effects/PitchEffect.cpp
     Effects/EchoEffect.h
     Effects/EchoEffect.cpp
+    Effects/DistortionEffect.h
+    Effects/DistortionEffect.cpp
     Effects/EffectChain.h
     Effects/EffectChain.cpp
 )
