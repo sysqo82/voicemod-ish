@@ -14,6 +14,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(JUCE)
 
 add_subdirectory(src)
+add_subdirectory(app)
 
 enable_testing()
 add_subdirectory(tests)

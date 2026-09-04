@@ -19,9 +19,4 @@ void EffectChain::processBlock(juce::AudioBuffer<float>& buffer)
             effect->process(buffer);
 }
 
-void EffectChain::addEffect(std::unique_ptr<Effect> effect)
-{
-    effects.push_back(std::move(effect));
-}
-
 }
