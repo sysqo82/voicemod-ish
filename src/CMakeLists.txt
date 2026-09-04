@@ -10,6 +10,8 @@ add_library(EffectsEngine STATIC
     Effects/EchoEffect.cpp
     Effects/DistortionEffect.h
     Effects/DistortionEffect.cpp
+    Effects/ReverbEffect.h
+    Effects/ReverbEffect.cpp
     Effects/EffectChain.h
     Effects/EffectChain.cpp
 )

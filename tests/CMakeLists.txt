@@ -5,6 +5,7 @@ add_executable(EffectsEngineTests
     PitchEffectTests.cpp
     EchoEffectTests.cpp
     DistortionEffectTests.cpp
+    ReverbEffectTests.cpp
     TestRunner.cpp
 )
 
